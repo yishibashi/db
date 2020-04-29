@@ -91,6 +91,7 @@ PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement)
     }
     if (strcmp(input_buffer->buffer, "select") == 0)
     {
+        statement->type = STATEMENT_SELECT;
         return PREPARE_SUCCESS;
     }
 
@@ -119,18 +120,15 @@ int main(int argc, char *argv[])
         print_prompt();
         read_input(input_buffer);
 
-        if (strcmp(input_buffer->buffer, ".exit") == 0)
+        if (input_buffer->buffer[0] == '.')
         {
-            if (input_buffer->buffer[0] == '.')
+            switch (do_meta_command(input_buffer))
             {
-                switch (do_meta_command(input_buffer))
-                {
-                case (META_COMMAND_SUCCESS):
-                    continue;
-                case (META_COMMAND_UNRECOGNIZED_COMMAND):
-                    printf("Unrecognized command '%s'\n", input_buffer->buffer);
-                    continue;
-                }
+            case (META_COMMAND_SUCCESS):
+                continue;
+            case (META_COMMAND_UNRECOGNIZED_COMMAND):
+                printf("Unrecognized command '%s'\n", input_buffer->buffer);
+                continue;
             }
         }
 
