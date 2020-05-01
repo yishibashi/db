@@ -2,3 +2,5 @@
 .history/
 .vscode/
 db
+.ruby-version
+Gemfile.lock
