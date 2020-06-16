@@ -67,18 +67,28 @@ const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 typedef struct
 {
-    uint32_t num_rows;
+    int file_descriptor;
+    uint32_t file_length;
     void *pages[TABLE_MAX_PAGES];
+} Pager;
+
+typedef struct
+{
+    uint32_t num_rows;
+    Pager *pager;
 } Table;
 
 void print_row(Row *row);
 void serialize_row(Row *source, void *destination);
 void deserialize_row(void *source, Row *destination);
+void *get_page(Pager *pager, uint32_t page_num);
 void *row_slot(Table *table, uint32_t row_num);
-Table *new_table();
-void free_table();
+Pager *pager_open();
+Table *db_open();
+void pager_flush(Pager *pager, uint32_t page_num, uint32_t size);
+void db_close(Table *table);
 InputBuffer *new_input_buffer();
-MetaCommandResults do_meta_command(InputBuffer *input_buffer);
+MetaCommandResults do_meta_command(InputBuffer *input_buffer, Table *table);
 PrepareResult prepare_insert(InputBuffer *input_buffer, Statement *statement);
 PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement);
 ExecuteResult execute_insert(Statement *statement, Table *table);
